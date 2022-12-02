@@ -1,6 +1,3 @@
 # applied-statistics
 
-Spørgsmål:
-
-1.
-2.
+Spørgsmål: https://www.dr.dk/nyheder/politik/folketingsvalg/kandidattest
