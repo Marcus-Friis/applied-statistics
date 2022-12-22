@@ -9,7 +9,7 @@ from scipy.cluster.hierarchy import dendrogram
 
 df = pd.read_csv('data/kandidater_data.csv').dropna()
 
-df = df.groupby('CurrentPartyCode').agg(
+agg = df.groupby('CurrentPartyCode').agg(
     {str(i): ['mean'] for i in range(1, 26)}
 ).reset_index()
 
@@ -42,7 +42,7 @@ colormap = {'A': '#A82721',
             'Æ': '#2C5877'}
 df['PartyColor'] = df.CurrentPartyCode.map(colormap)
 
-fig, ax = plt.subplots(3)
+fig, ax = plt.subplots(3, figsize=(6, 10))
 ax[0].scatter(df.tsne1, df.tsne2, color=df.PartyColor, label=df.CurrentPartyCode)
 
 color_palette = sns.color_palette('Paired', 14)
