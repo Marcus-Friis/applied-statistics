@@ -46,7 +46,7 @@ df['PartyColor'] = df.CurrentPartyCode.map(colormap)
 
 plt.style.use('ggplot')
 
-fig, ax = plt.subplots(2, figsize=(6, 10))
+fig, ax = plt.subplots(2, figsize=(6, 8))
 ax[0].scatter(df.tsne1, df.tsne2, color=df.PartyColor, label=df.CurrentPartyCode, alpha=.6)
 ax[0].set_title('True parties dim-reduced with t-sne')
 ax[0].set_xlabel('t-sne 1')
@@ -58,6 +58,8 @@ ax[1].scatter(df.tsne1, df.tsne2, color=color, alpha=.6)
 ax[1].set_title('Clusters dim-reduced with t-sne')
 ax[1].set_xlabel('t-sne 1')
 ax[1].set_ylabel('t-sne 2')
+
+plt.tight_layout()
 
 plt.savefig('tsne.svg')
 
