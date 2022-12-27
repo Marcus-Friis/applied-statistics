@@ -1,3 +1,5 @@
+import matplotlib as mpl
+from matplotlib.rcsetup import cycler
 from sklearn.cluster import AgglomerativeClustering
 import numpy as np
 import pandas as pd
@@ -19,7 +21,7 @@ clusters = clusterer.fit_predict(df[[str(i) for i in range(1, 26)]])
 df['cluster'] = clusters
 
 # Apply t-SNE to the selected columns
-tsne = TSNE(n_components=2)
+tsne = TSNE(n_components=2, random_state=69420)
 X_tsne = tsne.fit_transform(df[[str(i) for i in range(1, 26)]])
 
 # Add the transformed coordinates to the existing dataframe
@@ -42,12 +44,22 @@ colormap = {'A': '#A82721',
             'Æ': '#2C5877'}
 df['PartyColor'] = df.CurrentPartyCode.map(colormap)
 
-fig, ax = plt.subplots(3, figsize=(6, 10))
-ax[0].scatter(df.tsne1, df.tsne2, color=df.PartyColor, label=df.CurrentPartyCode)
+plt.style.use('ggplot')
+
+fig, ax = plt.subplots(2, figsize=(6, 10))
+ax[0].scatter(df.tsne1, df.tsne2, color=df.PartyColor, label=df.CurrentPartyCode, alpha=.6)
+ax[0].set_title('True parties dim-reduced with t-sne')
+ax[0].set_xlabel('t-sne 1')
+ax[0].set_ylabel('t-sne 2')
 
 color_palette = sns.color_palette('Paired', 14)
 color = [color_palette[i] for i in df.cluster]
-ax[1].scatter(df.tsne1, df.tsne2, color=color)
+ax[1].scatter(df.tsne1, df.tsne2, color=color, alpha=.6)
+ax[1].set_title('Clusters dim-reduced with t-sne')
+ax[1].set_xlabel('t-sne 1')
+ax[1].set_ylabel('t-sne 2')
+
+plt.savefig('tsne.svg')
 
 
 def plot_dendrogram(model, **kwargs):
@@ -75,11 +87,23 @@ def plot_dendrogram(model, **kwargs):
 
 def llf(id):
     if id < 14:
-        return df.CurrentPartyCode.iloc[id]
+        return agg.CurrentPartyCode.iloc[id]
     else:
         return str(id)
 
 
-params = {'ax': ax[2], 'leaf_label_func': llf}
+mpl.rcParams['axes.prop_cycle'] = cycler('color', ['#988ED5',  '#348ABD', '#E24A33', '#777777', '#FBC15E', '#8EBA42', '#FFB5B8'])
+
+fig, ax = plt.subplots()
+agg = df.groupby('CurrentPartyCode').agg({f'{i}': 'mean' for i in range(1, 26)}).reset_index()
+
+clusterer = AgglomerativeClustering(n_clusters=None, distance_threshold=24)
+clusters = clusterer.fit_predict(agg[[str(i) for i in range(1, 26)]])
+
+params = {'ax': ax, 'leaf_label_func': llf}
 plot_dendrogram(clusterer, truncate_mode="level", **params)
-plt.savefig('jeff.svg')
+ax.grid(False)
+ax.set_yticks([])
+ax.set_title('Hierarchical clustering of party means')
+ax.set_xlabel('Parties')
+plt.savefig('dendogram.svg')
