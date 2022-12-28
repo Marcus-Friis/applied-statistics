@@ -116,7 +116,6 @@ link_colors = dict()
 
 n_samples = df.shape[0]
 for i, child_idx in enumerate(linkage_matrix[:, :2]):
-    print(child_idx)
     c1, c2 = [leaf_colors[idx] if idx < n_samples else link_colors[idx] for idx in child_idx]
     link_colors[i+n_samples] = c1 if c1 == c2 else '#000000'
 
@@ -129,6 +128,8 @@ ax.set_title('Hierarchical clustering of party means')
 ax.set_xlabel('Candidates') 
 
 ax.set_xticks([])
+
+ax.invert_xaxis()
 
 plt.tight_layout()
 plt.savefig('tsne_dendogram.svg')
