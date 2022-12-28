@@ -99,32 +99,34 @@ def plot_dendrogram(model, **kwargs):
                 current_count += counts[child_idx - n_samples]
         counts[i] = current_count
 
-    linkage_matrix = np.column_stack(
+    return np.column_stack(
         [model.children_, model.distances_, counts]
     ).astype(float)
 
-    # Plot the corresponding dendrogram
-    dendrogram(linkage_matrix, **kwargs)
-
-def llf(id):
-    if id < df.shape[0]:
-        return df.CurrentPartyCode.iloc[id]
-    else:
-        return str(id)
 
 mpl.rcParams['axes.prop_cycle'] = cycler('color', ['#988ED5',  '#348ABD', '#E24A33', '#777777', '#FBC15E', '#8EBA42', '#FFB5B8'])
 
 ax = fig.add_subplot(gs[:, 1])
-params = {'ax': ax, 'leaf_label_func': llf, 'leaf_rotation': 0, 'show_leaf_counts': True}
-plot_dendrogram(clusterer, truncate_mode="level", **params)
+color = {i: colormap[color_palette[row.cluster]] for i, row in df.iterrows()}
+
+linkage_matrix = plot_dendrogram(clusterer, truncate_mode="level", )
+
+leaf_colors = {i: colormap[color_palette[df.iloc[i].cluster]] for i in range(df.shape[0])}
+link_colors = dict()
+
+n_samples = df.shape[0]
+for i, child_idx in enumerate(linkage_matrix[:, :2]):
+    print(child_idx)
+    c1, c2 = [leaf_colors[idx] if idx < n_samples else link_colors[idx] for idx in child_idx]
+    link_colors[i+n_samples] = c1 if c1 == c2 else '#000000'
+
+
+params = {'ax': ax, 'leaf_rotation': 0, 'link_color_func': lambda x: link_colors[x]}
+dendrogram(linkage_matrix, **params)
 ax.grid(False)
 ax.set_yticks([])
 ax.set_title('Hierarchical clustering of party means')
-ax.set_xlabel('Candidates')
-
-xlbls = ax.get_xmajorticklabels()
-for lbl in xlbls:
-    lbl.set_color(colormap[lbl.get_text()])
+ax.set_xlabel('Candidates') 
 
 ax.set_xticks([])
 
