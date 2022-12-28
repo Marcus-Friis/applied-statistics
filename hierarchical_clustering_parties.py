@@ -95,4 +95,6 @@ xlbls = ax.get_xmajorticklabels()
 for lbl in xlbls:
     lbl.set_color(colormap[lbl.get_text()])
 
+ax.invert_xaxis()
+
 plt.savefig('dendogram_parties.svg')
